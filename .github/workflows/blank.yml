@@ -1,36 +1,46 @@
-name: Build Solution
+name: Clone and Build External Repository
 
 on:
   push:
     branches:
-      - main  # 或者你的目标分支
-  workflow_dispatch:  # 允许手动触发
+      - main
+  workflow_dispatch:  # 支持手动触发
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      # Step 1: 克隆当前仓库（如果需要）
+      - name: Checkout current repository
         uses: actions/checkout@v3
 
-      - name: List files to verify .sln location
+      # Step 2: 克隆外部仓库
+      - name: Clone external repository
         run: |
-          dir # 在 Windows 环境下使用 `dir` 来列出文件
+          git clone https://github.com/PCL-Community/PCL2-CE external-repo
+          cd external-repo
+          dir
 
+      # Step 3: 设置 MSBuild 环境
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
 
+      # Step 4: 恢复 NuGet 包
       - name: Restore NuGet packages
         run: |
+          cd external-repo
           nuget restore "Plain Craft Launcher 2.sln"
 
-      - name: Build solution
+      # Step 5: 编译解决方案
+      - name: Build Solution
         run: |
+          cd external-repo
           msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
 
-      - name: Upload build artifacts (optional)
+      # Step 6: 上传构建结果 (可选)
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: path/to/output/directory
+          path: external-repo/bin/Release
