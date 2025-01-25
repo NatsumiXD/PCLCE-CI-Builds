@@ -22,23 +22,21 @@ jobs:
       # Step 3: 恢复 NuGet 包
       - name: Restore NuGet packages
         run: |
-          cd external-repo
-          nuget restore "Plain Craft Launcher 2.sln"
+          nuget restore "external-repo/Plain Craft Launcher 2.sln"
 
       # Step 4: 编译解决方案
       - name: Build Solution
         run: |
-          cd external-repo
-          msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
+          msbuild "external-repo/Plain Craft Launcher 2.sln" /p:Configuration=Release
 
       # Step 5: 列出编译后的文件
       - name: List compiled files
         run: |
-          cd external-repo/Plain Craft Launcher 2/bin
+          dir "external-repo/Plain Craft Launcher 2/bin/Release"
 
       # Step 6: 上传编译结果
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: external-repo/Plain Craft Launcher 2/bin # 指定正确的输出文件夹
+          path: external-repo/Plain Craft Launcher 2/bin/Release
