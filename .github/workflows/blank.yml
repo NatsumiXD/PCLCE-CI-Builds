@@ -37,6 +37,7 @@ jobs:
         run: |
           cd external-repo
           msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
+          dir
 
       # Step 6: 上传构建结果
       - name: Upload build artifacts
