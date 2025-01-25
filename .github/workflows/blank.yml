@@ -35,7 +35,6 @@ jobs:
       - name: List compiled files
         run: |
           cd external-repo/Plain Craft Launcher 2/bin
-          dir /s # 列出 bin 文件夹中的所有文件
 
       # Step 6: 上传编译结果
       - name: Upload build artifacts
