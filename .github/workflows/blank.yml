@@ -16,7 +16,7 @@ jobs:
 
       - name: List files to verify .sln location
         run: |
-          ls -R
+          dir # 在 Windows 环境下使用 `dir` 来列出文件
 
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
