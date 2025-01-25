@@ -1,4 +1,4 @@
-name: Clone and Build External Repository
+name: Clone, Build, and Archive Project
 
 on:
   workflow_dispatch:
@@ -29,14 +29,14 @@ jobs:
         run: |
           msbuild "external-repo/Plain Craft Launcher 2.sln" /p:Configuration=Release
 
-      # Step 5: 列出编译后的文件
-      - name: List compiled files
+      # Step 5: 压缩整个项目文件夹
+      - name: Archive project folder
         run: |
-          dir "external-repo/Plain Craft Launcher 2/bin/Release"
+          Compress-Archive -Path "external-repo/*" -DestinationPath "external-repo.zip"
 
-      # Step 6: 上传编译结果
-      - name: Upload build artifacts
+      # Step 6: 上传压缩文件
+      - name: Upload archived project
         uses: actions/upload-artifact@v3
         with:
-          name: build-output
-          path: external-repo/Plain Craft Launcher 2/bin/Release
+          name: project-archive
+          path: external-repo.zip
