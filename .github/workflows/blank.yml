@@ -34,7 +34,7 @@ jobs:
       # Step 5: 列出编译后的文件
       - name: List compiled files
         run: |
-          cd external-repo/bin
+          cd external-repo/Plain Craft Launcher 2/bin
           dir /s # 列出 bin 文件夹中的所有文件
 
       # Step 6: 上传编译结果
@@ -42,5 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: external-repo/bin/ # 指定输出文件夹
- 
+          path: external-repo/Plain Craft Launcher 2/bin # 指定正确的输出文件夹
