@@ -14,6 +14,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: List files to verify .sln location
+        run: |
+          ls -R
+
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
 
@@ -29,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: path/to/output/directory  # 根据需要调整输出路径
+          path: path/to/output/directory
