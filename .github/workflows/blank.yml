@@ -27,7 +27,7 @@ jobs:
       # Step 4: 编译解决方案
       - name: Build Solution
         run: |
-          msbuild "external-repo/Plain Craft Launcher 2.sln" /p:Configuration=Release
+          msbuild "external-repo/Plain Craft Launcher 2.sln" /p:Configuration=Snapshot
 
       # Step 5: 压缩整个项目文件夹
       - name: Archive project folder
