@@ -1,4 +1,4 @@
-name: Build Plain Craft Launcher 2
+name: Build Solution
 
 on:
   push:
@@ -29,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: path/to/output/directory
+          path: path/to/output/directory  # 根据需要调整输出路径
