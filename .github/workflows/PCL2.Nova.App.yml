@@ -1,82 +1,50 @@
-name: Build Application
+name: Build PCL2.Nova.App
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # 触发条件：推送到 main 分支时运行
   pull_request:
-    branches: [ main ]
+    branches:
+      - main  # 触发条件：针对 main 分支的 PR 时运行
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest  # 使用 Windows 环境
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # 1. 克隆仓库
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # 安装系统依赖 (Linux 需要额外步骤)
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev patchelf
-
-      # 安装 Node.js 和 pnpm
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # 2. 设置 Node.js 环境
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: pnpm
+          node-version: 18  # 指定 Node.js 版本
+          cache: 'pnpm'     # 缓存 pnpm 依赖
 
+      # 3. 安装 pnpm
       - name: Install pnpm
-        run: npm install -g pnpm@8
+        run: npm install -g pnpm
 
-      # 安装 Rust (Tauri 依赖)
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: rustfmt, clippy
-          override: true
-
-      # 缓存优化
-      - name: Cache pnpm modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-pnpm-modules
-        with:
-          path: |
-            node_modules
-            ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Cache cargo registry
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      # 安装项目依赖
+      # 4. 安装依赖
       - name: Install dependencies
         run: pnpm install
 
-      # 构建项目
-      - name: Build with Tauri
-        run: pnpm tauri build
+      # 5. 编译 Windows 版本
+      - name: Build for Windows
+        run: pnpm tauri build --target x86_64-pc-windows-msvc
 
-      # 上传构建产物
-      - name: Upload Artifacts
+      # 6. 打包整个仓库
+      - name: Package repository
+        run: |
+          $repoName = (Get-Item -Path .).Name
+          Compress-Archive -Path . -DestinationPath "$repoName.zip"
+
+      # 7. 上传构建产物
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: release-${{ runner.os }}
-          path: |
-            src-tauri/target/release/*.deb
-            src-tauri/target/release/*.app.tar.gz
-            src-tauri/target/release/*.msi
-          if-no-files-found: error
+          name: PCL2.Nova.App
+          path: ./PCL2.Nova.App.zip  # 上传打包后的文件
