@@ -1,4 +1,4 @@
-name: Clone, Build, and Archive Project
+name: PCL2.NEXT
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
       # Step 1: 克隆外部仓库
       - name: Clone external repository
         run: |
-          git clone https://github.com/PCL-Community/PCL2-CE external-repo
+          git clone https://github.com/PCL-Community/PCL2-Next external-repo
           cd external-repo
           dir
 

@@ -1,0 +1,98 @@
+name: Build Application
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  RUST_VERSION: "1.85.0"  # 固定 Rust 版本
+  NODE_VERSION: "18"      # 锁定 Node 主版本
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 安装 Linux 系统依赖
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.0-dev \
+            build-essential \
+            curl \
+            wget \
+            libssl-dev \
+            libgtk-3-dev \
+            patchelf
+
+      # 精确安装 Node.js 18.x
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}.x"  # 自动使用 18.x 最新版
+          cache: pnpm
+
+      # 安装指定版本 pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm@8
+
+      # 强制安装 Rust 1.85.0
+      - name: Install Rust ${{ env.RUST_VERSION }}
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.RUST_VERSION }}  # 指定精确版本
+          components: rustfmt, clippy
+          override: true
+
+      # 缓存优化配置
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.pnpm-store
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('Cargo.lock') }}
+
+      # 安装依赖
+      - name: Install dependencies
+        run: pnpm install
+
+      # 验证版本
+      - name: Verify Environments
+        run: |
+          node --version
+          rustc --version
+          pnpm --version
+
+      # 构建阶段
+      - name: Build with Tauri
+        run: pnpm tauri build
+
+      # 上传产物
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-${{ runner.os }}
+          path: |
+            src-tauri/target/release/*.deb
+            src-tauri/target/release/*.app.tar.gz
+            src-tauri/target/release/*.msi
