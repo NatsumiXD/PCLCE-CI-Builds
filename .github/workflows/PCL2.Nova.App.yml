@@ -17,6 +17,14 @@ jobs:
     - name: Clone PCL2.Nova.App repository
       run: git clone https://github.com/PCL-Community/PCL2.Nova.App.git
 
+    - name: Install Rust nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: nightly
+        components: cargo
+        override: true
+
     - name: Set up pnpm
       uses: pnpm/action-setup@v2
       with:
@@ -33,7 +41,7 @@ jobs:
         pnpm tauri build --target windows
 
     - name: Archive the build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@latest
       with:
         name: PCL2-Nova-App-Windows-Build
         path: PCL2.Nova.App/target/tauri/windows/*
