@@ -22,7 +22,7 @@ jobs:
       # Step 3: 恢复 NuGet 包
       - name: Restore NuGet packages
         run: |
-          nuget restore "external-repo/Plain Craft Launcher 2.sln"
+          nuget restore "external-repo/PCL2.Neo.sln"
 
       # Step 4: 编译解决方案
       - name: Build Solution
