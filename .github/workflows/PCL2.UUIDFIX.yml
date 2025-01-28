@@ -1,0 +1,42 @@
+name: PCL2.CE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Step 1: 克隆外部仓库
+      - name: Clone external repository
+        run: |
+          git clone https://github.com/PCL-Community/PCL2-Uuid-Fix external-repo
+          cd external-repo
+          dir
+
+      # Step 2: 设置 MSBuild 环境
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      # Step 3: 恢复 NuGet 包
+      - name: Restore NuGet packages
+        run: |
+          nuget restore "external-repo/Plain Craft Launcher 2.sln"
+
+      # Step 4: 编译解决方案
+      - name: Build Solution
+        run: |
+          msbuild "external-repo/Plain Craft Launcher 2.sln" /p:Configuration=Release
+
+      # Step 5: 压缩整个项目文件夹
+      - name: Archive project folder
+        run: |
+          Compress-Archive -Path "external-repo/*" -DestinationPath "external-repo.zip"
+
+      # Step 6: 上传压缩文件
+      - name: Upload archived project
+        uses: actions/upload-artifact@v3
+        with:
+          name: project-archive
+          path: external-repo.zip
