@@ -17,7 +17,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: PCL-Community/PCL2.Nova.App
+        repository: NatsumiXD/PCL2.Nova.App
         path: PCL2.Nova.App
 
     # Step 2: Setup Node.js and pnpm
