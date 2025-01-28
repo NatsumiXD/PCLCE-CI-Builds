@@ -1,4 +1,4 @@
-name: PCL2..UUIDFIX
+name: PCL2.UUIDFIX
 
 on:
   workflow_dispatch:
