@@ -33,7 +33,7 @@ jobs:
         pnpm tauri build --target windows
 
     - name: Archive the build
-      uses: @actions/upload-artifact@latest
+      uses: actions/upload-artifact@v3
       with:
         name: PCL2-Nova-App-Windows-Build
         path: PCL2.Nova.App/target/tauri/windows/*
