@@ -29,19 +29,15 @@ jobs:
     - name: Install pnpm
       run: npm install -g pnpm
 
-    # Step 3: Setup Rust
-    - name: Setup Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    
+    # Step 3: Install Rust nightly and ensure correct version
+    - name: Install Rust nightly
+      run: |
+        rustup install nightly
+        rustup default nightly
+
     - name: Ensure Rust version
       run: rustc --version
       shell: pwsh
-      env:
-        MIN_RUST_VERSION: '1.85.0'
 
     # Step 4: Install dependencies
     - name: Install dependencies
