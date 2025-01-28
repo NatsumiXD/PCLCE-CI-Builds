@@ -1,47 +1,68 @@
-name: Build and Package PCL2.Nova.App
+name: Build and Upload PCL2 Nova App
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      build_platform:
+        description: 'Build target platform'
+        default: 'windows'
+        required: false
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
+    # Step 1: Checkout the repository
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+        repository: PCL-Community/PCL2.Nova.App
+        path: PCL2.Nova.App
 
-    - name: Clone PCL2.Nova.App repository
-      run: git clone https://github.com/PCL-Community/PCL2.Nova.App.git
+    # Step 2: Setup Node.js and pnpm
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'pnpm'
 
-    - name: Install Rust nightly
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    # Step 3: Setup Rust
+    - name: Setup Rust
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
-        toolchain: nightly
-        components: cargo
+        toolchain: stable
         override: true
+    
+    - name: Ensure Rust version
+      run: rustc --version
+      shell: pwsh
+      env:
+        MIN_RUST_VERSION: '1.85.0'
 
-    - name: Set up pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 7
-
+    # Step 4: Install dependencies
     - name: Install dependencies
-      run: |
-        cd PCL2.Nova.App
-        pnpm install
+      run: pnpm install
+      working-directory: ./PCL2.Nova.App
 
-    - name: Build the Windows version
-      run: |
-        cd PCL2.Nova.App
-        pnpm tauri build --target windows
+    # Step 5: Build the application (Windows only)
+    - name: Build for Windows
+      run: pnpm tauri build
+      working-directory: ./PCL2.Nova.App
 
-    - name: Archive the build
-      uses: actions/upload-artifact@latest
+    # Step 6: Archive the built repository
+    - name: Archive repository
+      run: |
+        Compress-Archive -Path ./PCL2.Nova.App/* -DestinationPath ./PCL2_Nova_App_Build.zip
+      shell: pwsh
+
+    # Step 7: Upload artifact
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: PCL2-Nova-App-Windows-Build
-        path: PCL2.Nova.App/target/tauri/windows/*
+        name: PCL2_Nova_App_Build
+        path: ./PCL2_Nova_App_Build.zip
