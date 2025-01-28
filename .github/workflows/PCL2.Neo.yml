@@ -15,26 +15,33 @@ jobs:
           cd external-repo
           dir
 
-      # Step 2: 设置 MSBuild 环境
+      # Step 2: 替换字体文件
+      - name: Replace Font.ttf
+        run: |
+          mkdir -Force "external-repo/Resources"
+          Copy-Item -Path "./neo/MiSans-Normal.ttf" -Destination "external-repo/Resources/Font.ttf" -Force
+          dir "external-repo/Resources"
+
+      # Step 3: 设置 MSBuild 环境
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
 
-      # Step 3: 恢复 NuGet 包
+      # Step 4: 恢复 NuGet 包
       - name: Restore NuGet packages
         run: |
           nuget restore "external-repo/PCL2.Neo.sln"
 
-      # Step 4: 编译解决方案
+      # Step 5: 编译解决方案
       - name: Build Solution
         run: |
           msbuild "external-repo/PCL2.Neo.sln" /p:Configuration=Release
 
-      # Step 5: 压缩整个项目文件夹
+      # Step 6: 压缩整个项目文件夹
       - name: Archive project folder
         run: |
           Compress-Archive -Path "external-repo/*" -DestinationPath "external-repo.zip"
 
-      # Step 6: 上传压缩文件
+      # Step 7: 上传压缩文件
       - name: Upload archived project
         uses: actions/upload-artifact@v3
         with:
