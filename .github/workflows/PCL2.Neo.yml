@@ -11,7 +11,7 @@ jobs:
       # Step 1: 克隆外部仓库
       - name: Clone external repository
         run: |
-          Get-ChildItem "C:\path\to\directory" -Recurse
+          Get-ChildItem "./" -Recurse
           git clone https://github.com/PCL-Community/PCL2.Neo external-repo
           cd external-repo
           dir
