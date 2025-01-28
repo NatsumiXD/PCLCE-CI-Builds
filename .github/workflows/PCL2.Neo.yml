@@ -20,7 +20,7 @@ jobs:
       - name: Replace Font.ttf
         run: |
           mkdir -Force "external-repo/Resources"
-          Copy-Item -Path "cd ${GITHUB_WORKSPACE}/neo/MiSans-Normal.ttf" -Destination "external-repo/Resources/Font.ttf" -Force
+          Copy-Item -Path "${GITHUB_WORKSPACE}/neo/MiSans-Normal.ttf" -Destination "external-repo/Resources/Font.ttf" -Force
           dir "external-repo/Resources"
 
       # Step 3: 设置 MSBuild 环境
