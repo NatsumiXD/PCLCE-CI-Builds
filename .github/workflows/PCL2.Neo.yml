@@ -22,7 +22,7 @@ jobs:
         run: |
           mkdir -Force "external-repo/PCL2.Neo/Resources"
           Copy-Item -Path "./neo/MiSans-Normal.ttf" -Destination "external-repo/PCL2.Neo/Resources/Font.ttf" -Force
-          dir "external-repo/Resources"
+          dir "external-repo/PCL2.Neo/Resources"
 
       # Step 3: 设置 MSBuild 环境
       - name: Set up MSBuild
