@@ -1,62 +1,39 @@
-name: Build PCL2.Nova.App
+name: Build and Package PCL2.Nova.App
 
 on:
   push:
     branches:
-      - main  # 触发条件：推送到 main 分支时运行
-  pull_request:
-    branches:
-      - main  # 触发条件：针对 main 分支的 PR 时运行
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest  # 使用 Windows 环境
+    runs-on: windows-latest
 
     steps:
-      # 1. 克隆仓库
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      # 2. 设置 Node.js 环境
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18  # 指定 Node.js 版本
-          cache: 'pnpm'     # 缓存 pnpm 依赖
+    - name: Clone PCL2.Nova.App repository
+      run: git clone https://github.com/PCL-Community/PCL2.Nova.App.git
 
-      # 3. 安装 pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm
-        shell: pwsh  # 使用 PowerShell 执行命令
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 7
 
-      # 4. 将 pnpm 添加到 PATH
-      - name: Add pnpm to PATH
-        run: |
-          $pnpmPath = (Get-Command pnpm).Source
-          echo "Adding pnpm to PATH: $pnpmPath"
-          echo "$pnpmPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: pwsh  # 使用 PowerShell 执行命令
+    - name: Install dependencies
+      run: |
+        cd PCL2.Nova.App
+        pnpm install
 
-      # 5. 安装依赖
-      - name: Install dependencies
-        run: pnpm install
-        shell: pwsh  # 使用 PowerShell 执行命令
+    - name: Build the Windows version
+      run: |
+        cd PCL2.Nova.App
+        pnpm tauri build --target windows
 
-      # 6. 编译 Windows 版本
-      - name: Build for Windows
-        run: pnpm tauri build --target x86_64-pc-windows-msvc
-        shell: pwsh  # 使用 PowerShell 执行命令
-
-      # 7. 打包整个仓库
-      - name: Package repository
-        run: |
-          $repoName = (Get-Item -Path .).Name
-          Compress-Archive -Path . -DestinationPath "$repoName.zip"
-        shell: pwsh  # 使用 PowerShell 执行命令
-
-      # 8. 上传构建产物
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: PCL2.Nova.App
-          path: ./PCL2.Nova.App.zip  # 上传打包后的文件
+    - name: Archive the build
+      uses: actions/upload-artifact@v2
+      with:
+        name: PCL2-Nova-App-Windows-Build
+        path: PCL2.Nova.App/target/tauri/windows/*
