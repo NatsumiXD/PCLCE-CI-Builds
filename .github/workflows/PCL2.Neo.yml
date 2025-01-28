@@ -13,6 +13,7 @@ jobs:
       - name: Clone external repository
         run: |
           git clone https://github.com/PCL-Community/PCL2.Neo external-repo
+          dir
           cd external-repo
           dir
 
@@ -20,7 +21,7 @@ jobs:
       - name: Replace Font.ttf
         run: |
           mkdir -Force "external-repo/Resources"
-          Copy-Item -Path "../neo/MiSans-Normal.ttf" -Destination "external-repo/Resources/Font.ttf" -Force
+          Copy-Item -Path "./neo/MiSans-Normal.ttf" -Destination "external-repo/Resources/Font.ttf" -Force
           dir "external-repo/Resources"
 
       # Step 3: 设置 MSBuild 环境
