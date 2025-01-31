@@ -45,7 +45,7 @@ jobs:
 
       # Step 7: 上传压缩文件
       - name: Upload archived project
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: project-archive
           path: external-repo.zip
